@@ -49,6 +49,8 @@ Timebox:
 - 60 min negative API test scenarios
 - 30 min mapping notes
 
+**Day 2 detail:** practice goals, tasks, and checklist live in [docs/day-02-aspnet-api-design.md](docs/day-02-aspnet-api-design.md).
+
 ### Day 3 - Persistence with EF Core
 
 - Focus: DbContext, migrations, tracking vs no-tracking queries
