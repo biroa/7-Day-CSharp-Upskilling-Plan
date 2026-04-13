@@ -19,10 +19,6 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _userService.GetAllUsers();
-        if (users == null || users.Count == 0)
-        {
-            return NotFound("No users found");
-        }
         return Ok(users);
     }
 
@@ -41,12 +37,16 @@ public class UsersController : ControllerBase
     [HttpGet("by-email")]
     public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return BadRequest("Email is required");
+        }
         var user = await _userService.GetUserByEmail(email);
         if (user is null)
         {
             return NotFound($"User with email {email} not found");
         }
-
+        
         return Ok(user);
     }
 

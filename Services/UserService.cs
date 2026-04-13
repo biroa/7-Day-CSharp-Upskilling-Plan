@@ -10,18 +10,27 @@ public class UserService : IUserService
 
     public Task<User?> GetUserById(int id)
     {
+        if (id <= 0)
+        {
+            return Task.FromResult<User?>(null);
+        }
         var user = _users.FirstOrDefault(u => u.Id == id);
         return Task.FromResult(user);
     }
 
     public Task<User?> GetUserByEmail(string email)
     {
-        var user = _users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Task.FromResult<User?>(null);
+        }
+        var user = _users.FirstOrDefault(u => u.Email.Equals(email.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
         return Task.FromResult(user);
     }
 
     public Task<User> CreateUser(CreateUserDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var validationContext = new ValidationContext(dto);
         var validationResults = new List<ValidationResult>();
 
@@ -36,7 +45,7 @@ public class UserService : IUserService
             Id = _nextId++,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
-            Email = dto.Email,
+            Email = dto.Email.Trim().ToLowerInvariant(),
             PhoneNumber = dto.PhoneNumber,
             BirthDate = dto.BirthDate,
             Address = dto.Address,
@@ -51,11 +60,12 @@ public class UserService : IUserService
 
     public Task<List<User>> GetAllUsers()
     {
-        return Task.FromResult(_users);
+        return Task.FromResult(_users.ToList());
     }
 
     public Task<User?> UpdateUser(int id, CreateUserDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var validationContext = new ValidationContext(dto);
         var validationResults = new List<ValidationResult>();
 
@@ -73,7 +83,7 @@ public class UserService : IUserService
 
         existingUser.FirstName = dto.FirstName;
         existingUser.LastName = dto.LastName;
-        existingUser.Email = dto.Email;
+        existingUser.Email = dto.Email.Trim().ToLowerInvariant();
         existingUser.PhoneNumber = dto.PhoneNumber;
         existingUser.BirthDate = dto.BirthDate;
         existingUser.Address = dto.Address;
