@@ -62,10 +62,10 @@ Work in `Program.cs`, `Controllers/UsersController.cs`, and any new middleware/h
 3. [x] **Add global exception handling**  
    Catch unhandled exceptions once, log them, return `500` + `ProblemDetails` (no sensitive details in production).
 
-4. [ ] **Confirm validation path**  
+4. [x] **Confirm validation path**  
    Trigger a bad `POST` body and confirm you still get a clear `400` with validation details (built-in behavior + your consistency goals).
 
-5. [ ] **Negative testing pass**  
+5. [x] **Negative testing pass**  
    Run the scenarios in [Negative test ideas](#negative-test-ideas) below; note any inconsistent bodies or status codes and fix them.
 
 ## Negative test ideas
@@ -96,7 +96,7 @@ Use this at the end of Day 2 to confirm you closed the loop.
 - [ ] **Responses standardized:** success and error paths use predictable status codes and JSON shapes
 - [ ] **`ProblemDetails` in use:** at least validation and one error path use structured errors
 - [ ] **Global handler added:** unhandled exceptions become safe `500` responses
-- [ ] **Negative tests run:** documented or checked off against the table above
+- [x] **Negative tests run:** documented or checked off against the table above
 - [ ] **Notes captured:** short Laravel ↔ .NET comparison for middleware and errors
 - [ ] **Retro done (10–15 min):** what to carry into Day 3 (EF Core)
 

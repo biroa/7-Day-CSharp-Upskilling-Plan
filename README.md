@@ -54,7 +54,7 @@ Timebox:
 ### Day 3 - Persistence with EF Core
 
 - Focus: DbContext, migrations, tracking vs no-tracking queries
-- In project: replace in-memory list with EF Core + SQLite
+- In project: replace in-memory list with EF Core + Postgres
 - Deliverable: migration-based persistent CRUD
 
 Timebox:
@@ -62,6 +62,8 @@ Timebox:
 - 2h 30m DbContext + CRUD migration
 - 45 min migration/database verification
 - 30 min recap
+
+**Day 3 detail:** practice goals, tasks, and checklist live in [docs/day-03-ef-core-persistence.md](docs/day-03-ef-core-persistence.md).
 
 ### Day 4 - Validation, Mapping, and Domain Rules
 
