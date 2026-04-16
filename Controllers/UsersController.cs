@@ -38,24 +38,18 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("by-email")]
-    public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
+    public async Task<IActionResult> GetUserByEmail([FromQuery] GetUserByEmailQuery query)
     {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return Problem(
-                title: "Bad Request",
-                detail: "The email query parameter is required and cannot be empty.",
-                statusCode: StatusCodes.Status400BadRequest);
-        }
-        var user = await _userService.GetUserByEmail(email);
+        var user = await _userService.GetUserByEmail(query.Email);
+
         if (user is null)
         {
             return Problem(
                 title: "Not Found",
-                detail: $"No user was found with email '{email}'.",
+                detail: $"No user was found with email '{query.Email}'.",
                 statusCode: StatusCodes.Status404NotFound);
         }
-        
+
         return Ok(user);
     }
 
