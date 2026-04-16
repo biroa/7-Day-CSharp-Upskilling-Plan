@@ -53,9 +53,9 @@ Timebox:
 
 ### Day 3 - Persistence with EF Core
 
-- Focus: DbContext, migrations, tracking vs no-tracking queries
+- Focus: DbContext, migrations, tracking vs no-tracking queries (single `User` entity only)
 - In project: replace in-memory list with EF Core + Postgres
-- Deliverable: migration-based persistent CRUD
+- Deliverable: migration-based persistent CRUD; **relationship modeling (1:n, n:n, owned types, etc.) is intentionally deferred to a later EF Core deep-dive session once single-entity basics feel solid.**
 
 Timebox:
 - 45 min EF Core fundamentals
@@ -65,11 +65,11 @@ Timebox:
 
 **Day 3 detail:** practice goals, tasks, and checklist live in [docs/day-03-ef-core-persistence.md](docs/day-03-ef-core-persistence.md).
 
-### Day 4 - Validation, Mapping, and Domain Rules
+### Day 4 - Validation, Mapping, Domain Rules, and Basic Relationships
 
-- Focus: DTO separation, constraints, mapping strategy
-- In project: create request/response DTOs and enforce email uniqueness
-- Deliverable: stronger API contract
+- Focus: DTO separation, constraints, mapping strategy, and **first EF Core relationships**
+- In project: create request/response DTOs, enforce email uniqueness, and add a small set of related entities (for example `UserProfile` 1:1 and `Post` 1:n from `User`) with navigation properties and simple `Include` queries
+- Deliverable: stronger API contract plus a concrete feel for EF Core relationships beyond a single `User` table
 
 Timebox:
 - 30 min planning
@@ -133,6 +133,7 @@ Timebox:
 ## Week 2+ Extensions
 
 - Command Query Responsibility Segregation (CQRS) + MediatR
+- EF Core relationship modeling with multiple entities (1:n, n:n, owned types, delete behaviors)
 - Caching (in-memory or Redis)
 - Background jobs (HostedService or Hangfire)
 - Observability basics (OpenTelemetry)
