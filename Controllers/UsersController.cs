@@ -28,7 +28,10 @@ public class UsersController : ControllerBase
         var user = await _userService.GetUserById(id);
         if (user is null)
         {
-            return NotFound($"User with id {id} not found");
+            return Problem(
+                title: "Not Found",
+                detail: $"User with id {id} was not found.",
+                statusCode: StatusCodes.Status404NotFound);
         }
 
         return Ok(user);
@@ -39,12 +42,18 @@ public class UsersController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return BadRequest("Email is required");
+            return Problem(
+                title: "Bad Request",
+                detail: "The email query parameter is required and cannot be empty.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
         var user = await _userService.GetUserByEmail(email);
         if (user is null)
         {
-            return NotFound($"User with email {email} not found");
+            return Problem(
+                title: "Not Found",
+                detail: $"No user was found with email '{email}'.",
+                statusCode: StatusCodes.Status404NotFound);
         }
         
         return Ok(user);
@@ -63,7 +72,10 @@ public class UsersController : ControllerBase
         var updatedUser = await _userService.UpdateUser(id, user);
         if (updatedUser is null)
         {
-            return NotFound($"User with id {id} not found");
+            return Problem(
+                title: "Not Found",
+                detail: $"User with id {id} was not found.",
+                statusCode: StatusCodes.Status404NotFound);
         }
 
         return Ok(updatedUser);
@@ -75,7 +87,10 @@ public class UsersController : ControllerBase
         var wasDeleted = await _userService.DeleteUser(id);
         if (!wasDeleted)
         {
-            return NotFound($"User with id {id} not found");
+            return Problem(
+                title: "Not Found",
+                detail: $"User with id {id} was not found.",
+                statusCode: StatusCodes.Status404NotFound);
         }
 
         return NoContent();

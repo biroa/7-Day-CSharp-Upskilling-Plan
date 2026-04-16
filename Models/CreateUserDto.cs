@@ -23,7 +23,7 @@ public class CreateUserDto
     public string PhoneNumber { get; set; } = string.Empty;
 
     [Required]
-    [DataType(DataType.Date)]
+    [DataType(DataType.Date)]   
     public DateTime BirthDate { get; set; } = DateTime.MinValue;
 
     [Required]
