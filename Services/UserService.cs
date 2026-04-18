@@ -9,10 +9,6 @@ public class UserService : IUserService
 {
     private readonly AppDbContext _dbContext;
 
-    // JSON dates deserialize as DateTimeKind.Unspecified; Npgsql cannot persist that to timestamptz.
-    private static DateTime BirthDateForStore(DateTime birthDate) =>
-        DateTime.SpecifyKind(birthDate.Date, DateTimeKind.Utc);
-
     public UserService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -61,7 +57,7 @@ public class UserService : IUserService
             LastName = dto.LastName,
             Email = dto.Email.Trim().ToLowerInvariant(),
             PhoneNumber = dto.PhoneNumber,
-            BirthDate = BirthDateForStore(dto.BirthDate),
+            BirthDate = dto.BirthDate,
             Address = dto.Address,
             City = dto.City,
             State = dto.State,
@@ -102,7 +98,7 @@ public class UserService : IUserService
         existingUser.LastName = dto.LastName;
         existingUser.Email = dto.Email.Trim().ToLowerInvariant();
         existingUser.PhoneNumber = dto.PhoneNumber;
-        existingUser.BirthDate = BirthDateForStore(dto.BirthDate);
+        existingUser.BirthDate = dto.BirthDate;
         existingUser.Address = dto.Address;
         existingUser.City = dto.City;
         existingUser.State = dto.State;

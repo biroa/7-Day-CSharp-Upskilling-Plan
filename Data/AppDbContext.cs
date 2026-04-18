@@ -36,5 +36,8 @@ public class AppDbContext : DbContext
         // You can also fine-tune lengths if you want DB and attributes to match:
         user.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
         user.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+
+        // Calendar date only (PostgreSQL date — JSON "yyyy-MM-dd")
+        user.Property(u => u.BirthDate).HasColumnType("date");
     }
 }

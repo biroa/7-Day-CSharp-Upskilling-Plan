@@ -22,7 +22,7 @@ public class User
     [MaxLength(30)]
     public string PhoneNumber { get; set; } = string.Empty;
 
-    public DateTime BirthDate { get; set; } = DateTime.MinValue;
+    public DateOnly BirthDate { get; set; }
 
     [MaxLength(200)]
     public string Address { get; set; } = string.Empty;
