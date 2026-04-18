@@ -67,15 +67,21 @@ Timebox:
 
 ### Day 4 - Validation, Mapping, Domain Rules, and Basic Relationships
 
-- Focus: DTO separation, constraints, mapping strategy, and **first EF Core relationships**
-- In project: create request/response DTOs, enforce email uniqueness, and add a small set of related entities (for example `UserProfile` 1:1 and `Post` 1:n from `User`) with navigation properties and simple `Include` queries
-- Deliverable: stronger API contract plus a concrete feel for EF Core relationships beyond a single `User` table
+- Focus: DTO separation, constraints, mapping strategy, **first EF Core relationships**, and **idempotent seeding across multiple tables**
+- In project: create request/response DTOs, enforce email uniqueness, add a small set of related entities (for example `UserProfile` 1:1 and `Post` 1:n from `User`) with navigation properties and simple `Include` queries, then seed **realistic related rows** in a way that is safe to run repeatedly
+- Deliverable: stronger API contract, basic relationship queries working end-to-end, and a **dev-friendly idempotent seed** that populates the related tables without duplicating rows on restart
 
 Timebox:
 - 30 min planning
-- 2h 30m implementation
-- 60 min endpoint + mapping updates
+- 2h 15m implementation
+- 45 min endpoint + mapping updates
+- 30 min idempotent seeding design + migration/verification pass
 - 30 min verification/notes
+
+**Laravel ↔ .NET (Day 4 seeding angle):**
+- Laravel **`DatabaseSeeder` / `php artisan db:seed`** ↔ a small **hosted seed runner** (Development-only) *or* a **console host** that resolves `AppDbContext` from DI and executes seed logic
+- Laravel **“find or create by unique key”** seed patterns ↔ EF idempotency patterns such as **existence checks by natural keys**, **upsert-style updates**, or a **seed marker** row/table to gate reruns
+- Prefer wrapping multi-table seeds in a **transaction** so partial inserts do not leave the database half-populated
 
 ### Day 5 - Testing Foundations
 

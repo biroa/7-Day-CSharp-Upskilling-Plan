@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserApiTest.Middleware;
 
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             Title = "Internal Server Error",
             Type = "https://httpstatuses.com/500",
             Detail = _environment.IsDevelopment()
-                ? exception.Message
+                ? FormatDevelopmentDetail(exception)
                 : "An unexpected error occurred while processing your request.",
             Instance = httpContext.Request.Path
         };
@@ -44,5 +45,15 @@ public class GlobalExceptionHandler : IExceptionHandler
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true;
+    }
+
+    private static string FormatDevelopmentDetail(Exception exception)
+    {
+        if (exception is DbUpdateException dbEx && dbEx.InnerException is { } inner)
+        {
+            return $"{dbEx.Message} ({inner.Message})";
+        }
+
+        return exception.Message;
     }
 }

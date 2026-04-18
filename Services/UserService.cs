@@ -1,34 +1,49 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using UserApiTest.Data;
 using UserApiTest.Models;
 
 namespace UserApiTest.Services;
 
 public class UserService : IUserService
 {
-    private readonly List<User> _users = new List<User>();
-    private int _nextId = 1;
+    private readonly AppDbContext _dbContext;
 
-    public Task<User?> GetUserById(int id)
+    // JSON dates deserialize as DateTimeKind.Unspecified; Npgsql cannot persist that to timestamptz.
+    private static DateTime BirthDateForStore(DateTime birthDate) =>
+        DateTime.SpecifyKind(birthDate.Date, DateTimeKind.Utc);
+
+    public UserService(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<User?> GetUserById(int id)
     {
         if (id <= 0)
         {
-            return Task.FromResult<User?>(null);
+            return null;
         }
-        var user = _users.FirstOrDefault(u => u.Id == id);
-        return Task.FromResult(user);
+
+        return await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public Task<User?> GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return Task.FromResult<User?>(null);
+            return null;
         }
-        var user = _users.FirstOrDefault(u => u.Email.Equals(email.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
-        return Task.FromResult(user);
+
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        return await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail);
     }
 
-    public Task<User> CreateUser(CreateUserDto dto)
+    public async Task<User> CreateUser(CreateUserDto dto)
     {
         ArgumentNullException.ThrowIfNull(dto);
         var validationContext = new ValidationContext(dto);
@@ -42,28 +57,30 @@ public class UserService : IUserService
 
         var newUser = new User
         {
-            Id = _nextId++,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Email = dto.Email.Trim().ToLowerInvariant(),
             PhoneNumber = dto.PhoneNumber,
-            BirthDate = dto.BirthDate,
+            BirthDate = BirthDateForStore(dto.BirthDate),
             Address = dto.Address,
             City = dto.City,
             State = dto.State,
             ZipCode = dto.ZipCode,
         };
 
-        _users.Add(newUser);
-        return Task.FromResult(newUser);
+        _dbContext.Users.Add(newUser);
+        await _dbContext.SaveChangesAsync();
+        return newUser;
     }   
 
-    public Task<List<User>> GetAllUsers()
+    public async Task<List<User>> GetAllUsers()
     {
-        return Task.FromResult(_users.ToList());
+        return await _dbContext.Users
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public Task<User?> UpdateUser(int id, CreateUserDto dto)
+    public async Task<User?> UpdateUser(int id, CreateUserDto dto)
     {
         ArgumentNullException.ThrowIfNull(dto);
         var validationContext = new ValidationContext(dto);
@@ -75,35 +92,37 @@ public class UserService : IUserService
             throw new ValidationException($"Invalid update user payload: {errorMessages}");
         }
 
-        var existingUser = _users.FirstOrDefault(u => u.Id == id);
+        var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (existingUser is null)
         {
-            return Task.FromResult<User?>(null);
+            return null;
         }
 
         existingUser.FirstName = dto.FirstName;
         existingUser.LastName = dto.LastName;
         existingUser.Email = dto.Email.Trim().ToLowerInvariant();
         existingUser.PhoneNumber = dto.PhoneNumber;
-        existingUser.BirthDate = dto.BirthDate;
+        existingUser.BirthDate = BirthDateForStore(dto.BirthDate);
         existingUser.Address = dto.Address;
         existingUser.City = dto.City;
         existingUser.State = dto.State;
         existingUser.ZipCode = dto.ZipCode;
 
-        return Task.FromResult<User?>(existingUser);
+        await _dbContext.SaveChangesAsync();
+        return existingUser;
     }
 
-    public Task<bool> DeleteUser(int id)
+    public async Task<bool> DeleteUser(int id)
     {
-        var user = _users.FirstOrDefault(u => u.Id == id);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (user is null)
         {
-            return Task.FromResult(false);
+            return false;
         }
 
-        _users.Remove(user);
-        return Task.FromResult(true);
+        _dbContext.Users.Remove(user);
+        await _dbContext.SaveChangesAsync();
+        return true;
     }
 
 }

@@ -114,4 +114,17 @@ Use this at the end of Day 3 to confirm you closed the loop.
 
 ## Notes — (your space)
 
+- **`User` (model) entity attributes:** `Required` and `MaxLength` on `User` live in the EF Core entity so they both shape the database schema (non-null columns, string lengths, potential unique indexes) *and* can act as validation rules when the same properties are used in request/response models. This keeps database constraints and API expectations closely aligned.
+
+- **`dotnet ef migrations add InitialCreate` (generate migrations):** this command compares your current EF Core model (`AppDbContext` + entity configuration) to the previous model snapshot (`Migrations/AppDbContextModelSnapshot.cs`) and **writes new C# migration files** describing the SQL needed to move the database forward. It does **not** apply changes to the database by itself (unless you opt into special tooling flows).
+
+- **`dotnet ef database update` (apply migrations):** this command connects to the database using your configured connection string and **executes pending migrations** in order. EF records what was applied in **`__EFMigrationsHistory`** (`MigrationId`, `ProductVersion`) so future updates know what is already applied. On a brand-new database, tooling may log a failed first attempt to read `__EFMigrationsHistory` before the table exists; the important signal is whether migrations then apply and finish successfully.
+
+- **What the generated migration files are for:**
+  - **`Migrations/<timestamp>_InitialCreate.cs`:** the migration’s `Up`/`Down` methods that apply/revert schema operations (create/alter/drop tables, indexes, etc.).
+  - **`Migrations/<timestamp>_InitialCreate.Designer.cs`:** metadata for that specific migration revision (helps tooling and keeps the migration tied to a concrete model snapshot).
+  - **`Migrations/AppDbContextModelSnapshot.cs`:** the **current cumulative EF model** after the latest migration; this is what the next `dotnet ef migrations add ...` will diff against.
+
+- **Laravel mental model (quick):** `dotnet ef migrations add ...` is like authoring a new migration class from your model changes; `dotnet ef database update` is like `php artisan migrate` (apply pending migrations and record them).
+
 _Add your own bullets below as you learn (query behavior surprises, migration gotchas, Postgres quirks, performance notes)._

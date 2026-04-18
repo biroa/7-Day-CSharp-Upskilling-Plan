@@ -1,31 +1,43 @@
+using Microsoft.EntityFrameworkCore;
+using UserApiTest.Data;
 using UserApiTest.Middleware;
 using UserApiTest.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IUserService, UserService>();
+
+// DbContext registration (scoped per request)
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                           ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+    options.UseNpgsql(connectionString);
+});
+
+// UserService should be scoped when it depends on DbContext
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.MapOpenApi();
 }
 
-// app.UseHttpsRedirection();
+// Swashbuckle is not tied to Development so /swagger works with any launch profile
+// (e.g. `dotnet run --no-launch-profile` uses Production by default).
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 
